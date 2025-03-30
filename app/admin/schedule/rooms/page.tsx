@@ -1,13 +1,42 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Plus, Search, Building, ArrowUpDown } from "lucide-react"
-import { Table, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Plus, Search, Building, ArrowUpDown, AlertCircle } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 // Mock data for room assignments
 const buildings = [
@@ -46,7 +75,7 @@ const buildings = [
     totalRooms: 20,
     availableRooms: 5,
   },
-]
+];
 
 // Mock data for rooms
 const rooms = [
@@ -127,7 +156,7 @@ const rooms = [
     availability: "Scheduled",
     conflicts: 2,
   },
-]
+];
 
 // Mock data for room schedule
 const roomSchedule = [
@@ -179,84 +208,97 @@ const roomSchedule = [
     instructor: "Dr. Smith",
     recurring: false,
   },
-]
+];
 
 export default function RoomAssignmentsPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedBuilding, setSelectedBuilding] = useState("")
-  const [selectedRoomType, setSelectedRoomType] = useState("")
-  const [isAddRoomOpen, setIsAddRoomOpen] = useState(false)
-  const [isViewScheduleOpen, setIsViewScheduleOpen] = useState(false)
-  const [selectedRoom, setSelectedRoom] = useState<any>(null)
-  const [sortColumn, setSortColumn] = useState("number")
-  const [sortDirection, setSortDirection] = useState("asc")
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedBuilding, setSelectedBuilding] = useState("");
+  const [selectedRoom, setSelectedRoom] = useState({
+    number: "",
+    building: "",
+    type: "",
+    capacity: 0,
+  });
+  const [selectedRoomType, setSelectedRoomType] = useState("");
+  const [isAddRoomOpen, setIsAddRoomOpen] = useState(false);
+  const [isViewScheduleOpen, setIsViewScheduleOpen] = useState(false);
+  const [sortColumn, setSortColumn] = useState("number");
+  const [sortDirection, setSortDirection] = useState("asc");
 
   // Filter rooms based on search query and filters
-  const filteredRooms = rooms.filter(room => {
-    const matchesSearch = 
+  const filteredRooms = rooms.filter((room) => {
+    const matchesSearch =
       room.number.toLowerCase().includes(searchQuery.toLowerCase()) ||
       room.building.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      room.type.toLowerCase().includes(searchQuery.toLowerCase())
-    
-    const matchesBuilding = selectedBuilding ? room.building === selectedBuilding : true
-    const matchesType = selectedRoomType ? room.type === selectedRoomType : true
-    
-    return matchesSearch && matchesBuilding && matchesType
-  })
+      room.type.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesBuilding = selectedBuilding
+      ? room.building === selectedBuilding
+      : true;
+    const matchesType = selectedRoomType
+      ? room.type === selectedRoomType
+      : true;
+
+    return matchesSearch && matchesBuilding && matchesType;
+  });
 
   // Sort rooms
   const sortedRooms = [...filteredRooms].sort((a, b) => {
-    let comparison = 0
-    
+    let comparison = 0;
+
     if (sortColumn === "number") {
-      comparison = a.number.localeCompare(b.number, undefined, { numeric: true })
+      comparison = a.number.localeCompare(b.number, undefined, {
+        numeric: true,
+      });
     } else if (sortColumn === "building") {
-      comparison = a.building.localeCompare(b.building)
+      comparison = a.building.localeCompare(b.building);
     } else if (sortColumn === "type") {
-      comparison = a.type.localeCompare(b.type)
+      comparison = a.type.localeCompare(b.type);
     } else if (sortColumn === "capacity") {
-      comparison = a.capacity - b.capacity
+      comparison = a.capacity - b.capacity;
     }
-    
-    return sortDirection === "asc" ? comparison : -comparison
-  })
+
+    return sortDirection === "asc" ? comparison : -comparison;
+  });
 
   // Handle sort
-  const handleSort = (column: string) => {
+  const handleSort = (column: any) => {
     if (sortColumn === column) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
-      setSortColumn(column)
-      setSortDirection("asc")
+      setSortColumn(column);
+      setSortDirection("asc");
     }
-  }
+  };
 
   // View room schedule
   const handleViewSchedule = (room: any) => {
-    setSelectedRoom(room)
-    setIsViewScheduleOpen(true)
-  }
+    setSelectedRoom(room);
+    setIsViewScheduleOpen(true);
+  };
 
   // Get badge color based on availability
-  const getAvailabilityBadge = (availability: string) => {
+  const getAvailabilityBadge = (availability: any) => {
     switch (availability) {
       case "Available":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
       case "Scheduled":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
       case "Maintenance":
-        return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300"
+        return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300";
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">Room Assignments</h1>
-          <p className="text-muted-foreground">Manage classroom and facility assignments</p>
+          <p className="text-muted-foreground">
+            Manage classroom and facility assignments
+          </p>
         </div>
         <Button onClick={() => setIsAddRoomOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
@@ -284,22 +326,34 @@ export default function RoomAssignmentsPage() {
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Total Rooms:</span>
+                      <span className="text-sm text-muted-foreground">
+                        Total Rooms:
+                      </span>
                       <span className="font-medium">{building.totalRooms}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Available Rooms:</span>
-                      <span className="font-medium">{building.availableRooms}</span>
+                      <span className="text-sm text-muted-foreground">
+                        Available Rooms:
+                      </span>
+                      <span className="font-medium">
+                        {building.availableRooms}
+                      </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2 dark:bg-gray-700">
-                      <div 
-                        className="bg-purple-600 h-2.5 rounded-full" 
-                        style={{ width: `${(building.availableRooms / building.totalRooms) * 100}%` }}
+                      <div
+                        className="bg-purple-600 h-2.5 rounded-full"
+                        style={{
+                          width: `${(building.availableRooms / building.totalRooms) * 100}%`,
+                        }}
                       ></div>
                     </div>
                   </div>
                   <div className="mt-4 flex justify-end">
-                    <Button variant="outline" size="sm" onClick={() => setSelectedBuilding(building.name)}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelectedBuilding(building.name)}
+                    >
                       View Rooms
                     </Button>
                   </div>
@@ -320,18 +374,26 @@ export default function RoomAssignmentsPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <Select value={selectedBuilding} onValueChange={setSelectedBuilding}>
+            <Select
+              value={selectedBuilding}
+              onValueChange={setSelectedBuilding}
+            >
               <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder="All Buildings" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="">All Buildings</SelectItem>
                 {buildings.map((building) => (
-                  <SelectItem key={building.id} value={building.name}>{building.name}</SelectItem>
+                  <SelectItem key={building.id} value={building.name}>
+                    {building.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Select value={selectedRoomType} onValueChange={setSelectedRoomType}>
+            <Select
+              value={selectedRoomType}
+              onValueChange={setSelectedRoomType}
+            >
               <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder="All Room Types" />
               </SelectTrigger>
@@ -350,47 +412,55 @@ export default function RoomAssignmentsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead 
+                    <TableHead
                       className="cursor-pointer"
                       onClick={() => handleSort("number")}
                     >
                       <div className="flex items-center">
                         Room Number
                         {sortColumn === "number" && (
-                          <ArrowUpDown className={`ml-1 h-4 w-4 ${sortDirection === "desc" ? "rotate-180" : ""}`} />
+                          <ArrowUpDown
+                            className={`ml-1 h-4 w-4 ${sortDirection === "desc" ? "rotate-180" : ""}`}
+                          />
                         )}
                       </div>
                     </TableHead>
-                    <TableHead 
+                    <TableHead
                       className="cursor-pointer"
                       onClick={() => handleSort("building")}
                     >
                       <div className="flex items-center">
                         Building
                         {sortColumn === "building" && (
-                          <ArrowUpDown className={`ml-1 h-4 w-4 ${sortDirection === "desc" ? "rotate-180" : ""}`} />
+                          <ArrowUpDown
+                            className={`ml-1 h-4 w-4 ${sortDirection === "desc" ? "rotate-180" : ""}`}
+                          />
                         )}
                       </div>
                     </TableHead>
-                    <TableHead 
+                    <TableHead
                       className="cursor-pointer"
                       onClick={() => handleSort("type")}
                     >
                       <div className="flex items-center">
                         Type
                         {sortColumn === "type" && (
-                          <ArrowUpDown className={`ml-1 h-4 w-4 ${sortDirection === "desc" ? "rotate-180" : ""}`} />
+                          <ArrowUpDown
+                            className={`ml-1 h-4 w-4 ${sortDirection === "desc" ? "rotate-180" : ""}`}
+                          />
                         )}
                       </div>
                     </TableHead>
-                    <TableHead 
+                    <TableHead
                       className="cursor-pointer"
                       onClick={() => handleSort("capacity")}
                     >
                       <div className="flex items-center">
                         Capacity
                         {sortColumn === "capacity" && (
-                          <ArrowUpDown className={`ml-1 h-4 w-4 ${sortDirection === "desc" ? "rotate-180" : ""}\`)} />
+                          <ArrowUpDown
+                            className={`ml-1 h-4 w-4 ${sortDirection === "desc" ? "rotate-180" : ""}`}
+                          />
                         )}
                       </div>
                     </TableHead>
@@ -414,13 +484,24 @@ export default function RoomAssignmentsPage() {
                     </TableRow>
                   ) : (
                     sortedRooms.map((room) => (
-                      <TableRow key={room.id} className={room.conflicts > 0 ? "bg-red-50 dark:bg-red-950/20" : ""}>
-                        <TableCell className="font-medium">{room.number}</TableCell>
+                      <TableRow
+                        key={room.id}
+                        className={
+                          room.conflicts > 0
+                            ? "bg-red-50 dark:bg-red-950/20"
+                            : ""
+                        }
+                      >
+                        <TableCell className="font-medium">
+                          {room.number}
+                        </TableCell>
                         <TableCell>{room.building}</TableCell>
                         <TableCell>{room.type}</TableCell>
                         <TableCell>{room.capacity}</TableCell>
                         <TableCell>
-                          <Badge className={getAvailabilityBadge(room.availability)}>
+                          <Badge
+                            className={getAvailabilityBadge(room.availability)}
+                          >
                             {room.availability}
                           </Badge>
                           {room.conflicts > 0 && (
@@ -432,7 +513,11 @@ export default function RoomAssignmentsPage() {
                         <TableCell>
                           <div className="flex flex-wrap gap-1">
                             {room.features.slice(0, 2).map((feature, index) => (
-                              <Badge key={index} variant="outline" className="text-xs">
+                              <Badge
+                                key={index}
+                                variant="outline"
+                                className="text-xs"
+                              >
                                 {feature}
                               </Badge>
                             ))}
@@ -445,7 +530,11 @@ export default function RoomAssignmentsPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            <Button variant="outline" size="sm" onClick={() => handleViewSchedule(room)}>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleViewSchedule(room)}
+                            >
                               View Schedule
                             </Button>
                             <Button variant="outline" size="sm">
@@ -476,19 +565,25 @@ export default function RoomAssignmentsPage() {
               <Label htmlFor="room-number" className="text-right">
                 Room Number
               </Label>
-              <Input id="room-number" placeholder="e.g. 101" className="col-span-3" />
+              <Input
+                id="room-number"
+                placeholder="e.g. 101"
+                className="col-span-3"
+              />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="building" className="text-right">
                 Building
               </Label>
-              <Select className="col-span-3">
+              <Select>
                 <SelectTrigger id="building">
                   <SelectValue placeholder="Select building" />
                 </SelectTrigger>
                 <SelectContent>
                   {buildings.map((building) => (
-                    <SelectItem key={building.id} value={building.name}>{building.name}</SelectItem>
+                    <SelectItem key={building.id} value={building.name}>
+                      {building.name}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -497,7 +592,7 @@ export default function RoomAssignmentsPage() {
               <Label htmlFor="room-type" className="text-right">
                 Room Type
               </Label>
-              <Select className="col-span-3">
+              <Select>
                 <SelectTrigger id="room-type">
                   <SelectValue placeholder="Select room type" />
                 </SelectTrigger>
@@ -513,7 +608,12 @@ export default function RoomAssignmentsPage() {
               <Label htmlFor="capacity" className="text-right">
                 Capacity
               </Label>
-              <Input id="capacity" type="number" placeholder="e.g. 30" className="col-span-3" />
+              <Input
+                id="capacity"
+                type="number"
+                placeholder="e.g. 30"
+                className="col-span-3"
+              />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="features" className="text-right">
@@ -552,9 +652,7 @@ export default function RoomAssignmentsPage() {
             <Button variant="outline" onClick={() => setIsAddRoomOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={() => setIsAddRoomOpen(false)}>
-              Add Room
-            </Button>
+            <Button onClick={() => setIsAddRoomOpen(false)}>Add Room</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -574,14 +672,16 @@ export default function RoomAssignmentsPage() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <Badge variant="outline">{selectedRoom?.type}</Badge>
-                  <span className="text-sm">Capacity: {selectedRoom?.capacity}</span>
+                  <span className="text-sm">
+                    Capacity: {selectedRoom?.capacity}
+                  </span>
                 </div>
                 <Button size="sm">
                   <Plus className="h-4 w-4 mr-2" />
                   Add Schedule
                 </Button>
               </div>
-              
+
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -599,7 +699,9 @@ export default function RoomAssignmentsPage() {
                         <div className="flex items-center gap-2">
                           {schedule.day}
                           {schedule.recurring && (
-                            <Badge variant="outline" className="text-xs">Recurring</Badge>
+                            <Badge variant="outline" className="text-xs">
+                              Recurring
+                            </Badge>
                           )}
                         </div>
                       </TableCell>
@@ -611,7 +713,11 @@ export default function RoomAssignmentsPage() {
                           <Button variant="outline" size="sm">
                             Edit
                           </Button>
-                          <Button variant="outline" size="sm" className="text-red-500 hover:text-red-600">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-red-500 hover:text-red-600"
+                          >
                             Remove
                           </Button>
                         </div>
@@ -625,6 +731,5 @@ export default function RoomAssignmentsPage() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
-
